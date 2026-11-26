@@ -72,3 +72,46 @@ Bu eşikler kesin teşhis veya sensör arızası tespiti değildir. İncelenmesi
 ## 9. Önemli Not
 
 Anomali adayları otomatik olarak hastalık veya sensör arızası anlamına gelmez. Sonuçların sağlık personeli tarafından değerlendirilmesi gerekir.
+## Veri Modeli
+
+### 1. Güncel ERD
+
+```mermaid
+erDiagram
+    PATIENTS ||--o{ MEASUREMENTS : "has"
+    MEASUREMENTS ||--o{ ALARMS : "triggers"
+
+    PATIENTS {
+        integer id PK
+        string age_group
+        string gender
+    }
+
+    MEASUREMENTS {
+        integer id PK
+        integer patient_id FK
+        integer pulse
+        numeric oxygen_pct
+        timestamp measured_at
+    }
+
+    ALARMS {
+        integer id PK
+        integer measurement_id FK
+        string alarm_type
+        boolean source_estimated
+    }
+
+    REAL_MEASUREMENTS {
+        integer subject_id PK
+        integer reading_no PK
+        numeric pulse
+        numeric oxygen_pct
+    }
+```
+
+### İlişkilerin Açıklaması
+
+- Bir hasta sıfır veya daha fazla ölçüme sahip olabilir; her ölçüm bir hastaya aittir.
+- Bir ölçüm sıfır veya daha fazla alarm kaydına sahip olabilir; her alarm bir ölçüme aittir.
+- `real_measurements` tablosu, anonim gerçek veri setinden alınan ölçümleri içerir. Test verilerinden bağımsız tutulmuştur.

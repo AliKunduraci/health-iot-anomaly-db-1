@@ -133,7 +133,7 @@ erDiagram
 
 **Soru 1 — Hastaların ölçüm kayıtlarını listeleme**
 
-- **Türkçe soru:** Her hastanın kimlik numarasını ve kendisine ait nabız, oksijen doygunluğu ve ölçüm tarihini listeleyiniz.
+- **soru:** Her hastanın kimlik numarasını ve kendisine ait nabız, oksijen doygunluğu ve ölçüm tarihini listeleyiniz.
 - **Birleştirilen tablolar:** `patients` ve `measurements`
 - **Birleşme koşulu:** `patients.id = measurements.patient_id`
 - **JOIN türü:** `INNER JOIN`
@@ -141,7 +141,7 @@ erDiagram
 
 **Soru 2 — Hiç ölçümü olmayan hastaları bulma**
 
-- **Türkçe soru:** Sistemde kayıtlı olduğu hâlde henüz hiçbir ölçümü bulunmayan hastaları listeleyiniz.
+- **soru:** Sistemde kayıtlı olduğu hâlde henüz hiçbir ölçümü bulunmayan hastaları listeleyiniz.
 - **Birleştirilen tablolar:** `patients` ve `measurements`
 - **Birleşme koşulu:** `patients.id = measurements.patient_id`
 - **JOIN türü:** `LEFT JOIN`

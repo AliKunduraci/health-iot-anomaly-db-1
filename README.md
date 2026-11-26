@@ -72,3 +72,77 @@ Bu eşikler kesin teşhis veya sensör arızası tespiti değildir. İncelenmesi
 ## 9. Önemli Not
 
 Anomali adayları otomatik olarak hastalık veya sensör arızası anlamına gelmez. Sonuçların sağlık personeli tarafından değerlendirilmesi gerekir.
+## Veri Modeli
+
+### 1. Güncel ERD
+
+```mermaid
+erDiagram
+    PATIENTS ||--o{ MEASUREMENTS : "has"
+    MEASUREMENTS ||--o{ ALARMS : "triggers"
+
+    PATIENTS {
+        integer id PK
+        string age_group
+        string gender
+    }
+
+    MEASUREMENTS {
+        integer id PK
+        integer patient_id FK
+        integer pulse
+        numeric oxygen_pct
+        timestamp measured_at
+    }
+
+    ALARMS {
+        integer id PK
+        integer measurement_id FK
+        string alarm_type
+        boolean source_estimated
+    }
+
+    REAL_MEASUREMENTS {
+        integer subject_id PK
+        integer reading_no PK
+        numeric pulse
+        numeric oxygen_pct
+    }
+```
+
+### İlişkilerin Açıklaması
+
+- Bir hasta sıfır veya daha fazla ölçüme sahip olabilir; her ölçüm bir hastaya aittir.
+- Bir ölçüm sıfır veya daha fazla alarm kaydına sahip olabilir; her alarm bir ölçüme aittir.
+- `real_measurements` tablosu, anonim gerçek veri setinden alınan ölçümleri içerir. Test verilerinden bağımsız tutulmuştur.
+- ### 2. Normalizasyon Notları
+
+| Tablo | Neden ayrı tutuldu? Hangi sütun neyi belirliyor? | Normalizasyon |
+|---|---|---|
+| `patients` | Hasta bilgileri ölçüm tablosunda tekrar etmesin diye ayrılmıştır. `id`, `age_group` ve `gender` değerlerini belirler. | 1NF, 2NF, 3NF |
+| `measurements` | Her ölçüm ayrı kayıt olarak tutulur. `id`; `patient_id`, `pulse`, `oxygen_pct` ve `measured_at` değerlerini belirler. | 1NF, 2NF, 3NF |
+| `alarms` | Alarm bilgileri ölçüm bilgilerinden ayrı tutulur. `id`; `measurement_id`, `alarm_type` ve `source_estimated` değerlerini belirler. | 1NF, 2NF, 3NF |
+| `real_measurements` | Gerçek veri seti, test ölçümlerinden ayrı tutulmuştur. `(subject_id, reading_no)` birleşik anahtarı nabız ve oksijen değerlerini belirler. | 1NF, 2NF, 3NF |
+
+**1NF (Birinci Normal Form):** Tablolardaki her hücre tek bir değer içerir. Örneğin `measurements` tablosunda nabız ve oksijen değerleri ayrı sütunlarda tutulur.
+
+**2NF (İkinci Normal Form):** Tablolardaki anahtar olmayan sütunlar birincil anahtarın tamamına bağlıdır. Özellikle `real_measurements` tablosunda `pulse` ve `oxygen_pct`, birleşik anahtarın tamamına bağlıdır.
+
+**3NF (Üçüncü Normal Form):** Anahtar olmayan sütunlar arasında geçişli bağımlılık bulunmamalıdır. Örneğin hasta cinsiyeti ve yaş grubu `measurements` tablosunda tekrar edilmek yerine `patients` tablosunda tutulur.
+### 3. JOIN Soruları
+
+**Soru 1 — Hastaların ölçüm kayıtlarını listeleme**
+
+- **soru:** Her hastanın kimlik numarasını ve kendisine ait nabız, oksijen doygunluğu ve ölçüm tarihini listeleyiniz.
+- **Birleştirilen tablolar:** `patients` ve `measurements`
+- **Birleşme koşulu:** `patients.id = measurements.patient_id`
+- **JOIN türü:** `INNER JOIN`
+- **Nedeni:** Yalnızca birbiriyle eşleşen hasta ve ölçüm kayıtlarını listelemek istediğimiz için INNER JOIN kullanılır.
+
+**Soru 2 — Hiç ölçümü olmayan hastaları bulma**
+
+- **soru:** Sistemde kayıtlı olduğu hâlde henüz hiçbir ölçümü bulunmayan hastaları listeleyiniz.
+- **Birleştirilen tablolar:** `patients` ve `measurements`
+- **Birleşme koşulu:** `patients.id = measurements.patient_id`
+- **JOIN türü:** `LEFT JOIN`
+- **Nedeni:** Bütün hastaları listelemek ve ölçüm kaydı bulunmayan hastaları tespit etmek için LEFT JOIN kullanılır. `measurements.id IS NULL` koşuluyla eşleşmeyen hastalar bulunur.

@@ -129,3 +129,20 @@ erDiagram
 **2NF (İkinci Normal Form):** Tablolardaki anahtar olmayan sütunlar birincil anahtarın tamamına bağlıdır. Özellikle `real_measurements` tablosunda `pulse` ve `oxygen_pct`, birleşik anahtarın tamamına bağlıdır.
 
 **3NF (Üçüncü Normal Form):** Anahtar olmayan sütunlar arasında geçişli bağımlılık bulunmamalıdır. Örneğin hasta cinsiyeti ve yaş grubu `measurements` tablosunda tekrar edilmek yerine `patients` tablosunda tutulur.
+### 3. JOIN Soruları
+
+**Soru 1 — Hastaların ölçüm kayıtlarını listeleme**
+
+- **Türkçe soru:** Her hastanın kimlik numarasını ve kendisine ait nabız, oksijen doygunluğu ve ölçüm tarihini listeleyiniz.
+- **Birleştirilen tablolar:** `patients` ve `measurements`
+- **Birleşme koşulu:** `patients.id = measurements.patient_id`
+- **JOIN türü:** `INNER JOIN`
+- **Nedeni:** Yalnızca birbiriyle eşleşen hasta ve ölçüm kayıtlarını listelemek istediğimiz için INNER JOIN kullanılır.
+
+**Soru 2 — Hiç ölçümü olmayan hastaları bulma**
+
+- **Türkçe soru:** Sistemde kayıtlı olduğu hâlde henüz hiçbir ölçümü bulunmayan hastaları listeleyiniz.
+- **Birleştirilen tablolar:** `patients` ve `measurements`
+- **Birleşme koşulu:** `patients.id = measurements.patient_id`
+- **JOIN türü:** `LEFT JOIN`
+- **Nedeni:** Bütün hastaları listelemek ve ölçüm kaydı bulunmayan hastaları tespit etmek için LEFT JOIN kullanılır. `measurements.id IS NULL` koşuluyla eşleşmeyen hastalar bulunur.

@@ -115,3 +115,17 @@ erDiagram
 - Bir hasta sıfır veya daha fazla ölçüme sahip olabilir; her ölçüm bir hastaya aittir.
 - Bir ölçüm sıfır veya daha fazla alarm kaydına sahip olabilir; her alarm bir ölçüme aittir.
 - `real_measurements` tablosu, anonim gerçek veri setinden alınan ölçümleri içerir. Test verilerinden bağımsız tutulmuştur.
+- ### 2. Normalizasyon Notları
+
+| Tablo | Neden ayrı tutuldu? Hangi sütun neyi belirliyor? | Normalizasyon |
+|---|---|---|
+| `patients` | Hasta bilgileri ölçüm tablosunda tekrar etmesin diye ayrılmıştır. `id`, `age_group` ve `gender` değerlerini belirler. | 1NF, 2NF, 3NF |
+| `measurements` | Her ölçüm ayrı kayıt olarak tutulur. `id`; `patient_id`, `pulse`, `oxygen_pct` ve `measured_at` değerlerini belirler. | 1NF, 2NF, 3NF |
+| `alarms` | Alarm bilgileri ölçüm bilgilerinden ayrı tutulur. `id`; `measurement_id`, `alarm_type` ve `source_estimated` değerlerini belirler. | 1NF, 2NF, 3NF |
+| `real_measurements` | Gerçek veri seti, test ölçümlerinden ayrı tutulmuştur. `(subject_id, reading_no)` birleşik anahtarı nabız ve oksijen değerlerini belirler. | 1NF, 2NF, 3NF |
+
+**1NF (Birinci Normal Form):** Tablolardaki her hücre tek bir değer içerir. Örneğin `measurements` tablosunda nabız ve oksijen değerleri ayrı sütunlarda tutulur.
+
+**2NF (İkinci Normal Form):** Tablolardaki anahtar olmayan sütunlar birincil anahtarın tamamına bağlıdır. Özellikle `real_measurements` tablosunda `pulse` ve `oxygen_pct`, birleşik anahtarın tamamına bağlıdır.
+
+**3NF (Üçüncü Normal Form):** Anahtar olmayan sütunlar arasında geçişli bağımlılık bulunmamalıdır. Örneğin hasta cinsiyeti ve yaş grubu `measurements` tablosunda tekrar edilmek yerine `patients` tablosunda tutulur.
